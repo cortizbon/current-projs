@@ -1,2 +1,7 @@
-import streamlit as st
-import pandas as pd
+streamlit
+numpy
+pandas
+plotly
+matplotlib
+pywaffle
+seaborn
