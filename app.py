@@ -46,31 +46,7 @@ with tab1:
     except:
         st.warning("Not enough information.")
 
-with tab2:
-    geih = pd.read_csv('geih_milciles.csv')
-    income = st.number_input("¿De cuánto es su ingreso al mes?", min_value=10000)
-    geih.columns = geih.columns.str.strip()
-    def funcion(row, valor):
-        if row['mean(HHincome)'] < valor:
-            return 'menor'
-        else:
-            return 'mayor'
 
-    geih['pos'] = geih.apply(funcion, args=(income,), axis=1)
-    grupo = geih.groupby('pos')['of HHincome'].count().reset_index()
-
-    grupo['monto_promedio'] = geih.groupby('pos')['e(y| y > z)'].first()['mayor'], geih.groupby('pos')['e(y| y <z)'].last()['menor'] 
-
-    fig =plt.figure(
-        FigureClass=pwf.Waffle,
-        rows=20,
-        values=grupo['of HHincome'],
-        labels=list(grupo['pos']),  # Legend would not be created without this line
-        legend={'loc': 'upper left', 'bbox_to_anchor': (1, 1)},
-        icons='user',
-        block_aspect_ratio=0.7
-    )   
-    st.pyplot(fig)
 
 
 
