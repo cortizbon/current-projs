@@ -36,10 +36,10 @@ with tab1:
 
     change = ((tot_2024 / tot_2019) ** (1 / (2024 - 2019)))- 1
     with col1:
-        st.metric("Apropiación 2019", round(tot_2019 / 1_000_000_000, 2))
+        st.metric(f"Apropiación 2019", round(tot_2019 / 1_000_000_000, 2))
 
     with col2:
-        st.metric("Apropiación 2024", round(tot_2024 / 1_000_000_000, 2))
+        st.metric(f"Apropiación 2024", round(tot_2024 / 1_000_000_000, 2))
 
     with col3:
         st.metric("Variación anualizada", f"{round(change * 100, 2)}%")
@@ -55,10 +55,10 @@ with tab1:
 
     change = ((tot_2024 / tot_2019) ** (1 / (2024 - 2019)))- 1
     with col1:
-        st.metric(f"Apropiación {sector} 2019", round(tot_2019 / 1_000_000_000, 2))
+        st.metric(f"Apropiación | {sector} | 2019", round(tot_2019 / 1_000_000_000, 2))
 
     with col2:
-        st.metric(f"Apropiación {sector} 2024", round(tot_2024 / 1_000_000_000, 2))
+        st.metric(f"Apropiación | {sector} | 2024", round(tot_2024 / 1_000_000_000, 2))
 
     with col3:
         st.metric(f"Variación anualizada {sector}", f"{round(change * 100, 2)}%")
@@ -73,13 +73,13 @@ with tab1:
 
     change = ((tot_2024 / tot_2019) ** (1 / (2024 - 2019)))- 1
     with col1:
-        st.metric("Apropiación 2019", round(tot_2019 / 1_000_000_000, 2))
+        st.metric(f"Apropiación | {entidad} | 2019", round(tot_2019 / 1_000_000_000, 2))
 
     with col2:
-        st.metric("Apropiación 2024", round(tot_2024 / 1_000_000_000, 2))
+        st.metric(f"Apropiación | {entidad} | 2024", round(tot_2024 / 1_000_000_000, 2))
 
     with col3:
-        st.metric("Variación anualizada", f"{round(change * 100, 2)}%")
+        st.metric("Variación anualizada ", f"{round(change * 100, 2)}%")
 
     # cambio porcentual por unidad
 
@@ -93,10 +93,10 @@ with tab1:
 
     change = ((tot_2024 / tot_2019) ** (1 / (2024 - 2019)))- 1
     with col1:
-        st.metric("Apropiación 2019", round(tot_2019 / 1_000_000_000, 2))
+        st.metric(f"Apropiación | {unidad} | 2019", round(tot_2019 / 1_000_000_000, 2))
 
     with col2:
-        st.metric("Apropiación 2024", round(tot_2024 / 1_000_000_000, 2))
+        st.metric(f"Apropiación | {unidad} | 2024", round(tot_2024 / 1_000_000_000, 2))
 
     with col3:
         st.metric("Variación anualizada", f"{round(change * 100, 2)}%")
@@ -111,10 +111,10 @@ with tab1:
 
     change = ((tot_2024 / tot_2019) ** (1 / (2024 - 2019)))- 1
     with col1:
-        st.metric("Apropiación 2019", round(tot_2019 / 1_000_000_000, 2))
+        st.metric(f"Apropiación | {tipo_gasto} | 2019", round(tot_2019 / 1_000_000_000, 2))
 
     with col2:
-        st.metric("Apropiación 2024", round(tot_2024 / 1_000_000_000, 2))
+        st.metric(f"Apropiación | {tipo_gasto} | 2024", round(tot_2024 / 1_000_000_000, 2))
 
     with col3:
         st.metric("Variación anualizada", f"{round(change * 100, 2)}%")
@@ -131,10 +131,10 @@ with tab1:
 
     change = ((tot_2024 / tot_2019) ** (1 / (2024 - 2019)))- 1
     with col1:
-        st.metric("Apropiación 2019", round(tot_2019 / 1_000_000_000, 2))
+        st.metric(f"Apropiación | {cuenta} | 2019", round(tot_2019 / 1_000_000_000, 2))
 
     with col2:
-        st.metric("Apropiación 2024", round(tot_2024 / 1_000_000_000, 2))
+        st.metric(f"Apropiación | {cuenta} | 2024", round(tot_2024 / 1_000_000_000, 2))
 
     with col3:
         st.metric("Variación anualizada", f"{round(change * 100, 2)}%")
@@ -150,10 +150,10 @@ with tab1:
 
     change = ((tot_2024 / tot_2019) ** (1 / (2024 - 2019)))- 1
     with col1:
-        st.metric("Apropiación 2019", round(tot_2019 / 1_000_000_000, 2))
+        st.metric(f"Apropiación | {subcuenta} | 2019", round(tot_2019 / 1_000_000_000, 2))
 
     with col2:
-        st.metric("Apropiación 2024", round(tot_2024 / 1_000_000_000, 2))
+        st.metric(f"Apropiación | {subcuenta} | 2024", round(tot_2024 / 1_000_000_000, 2))
 
     with col3:
         st.metric("Variación anualizada", f"{round(change * 100, 2)}%")
@@ -169,10 +169,10 @@ with tab1:
 
     change = ((tot_2024 / tot_2019) ** (1 / (2024 - 2019)))- 1
     with col1:
-        st.metric("Apropiación 2019", round(tot_2019 / 1_000_000_000, 2))
+        st.metric(f"Apropiación | {objeto} | 2019", round(tot_2019 / 1_000_000_000, 2))
 
     with col2:
-        st.metric("Apropiación 2024", round(tot_2024 / 1_000_000_000, 2))
+        st.metric(f"Apropiación | {objeto} | 2024", round(tot_2024 / 1_000_000_000, 2))
 
     with col3:
         st.metric("Variación anualizada", f"{round(change * 100, 2)}%")    
@@ -183,10 +183,10 @@ with tab2:
     year = st.selectbox("Seleccione el año", 
                      [2019, 2024])
     filter_year = df[df['Año'] == year]
-    try:
+    
 
 
-        fig = px.treemap(filter_year, 
+    fig = px.treemap(filter_year, 
                             path=[px.Constant('PGN'), 'Sector', 
                                     'Entidad', 
                                     'Unidad',
@@ -195,11 +195,11 @@ with tab2:
                             color='Sector',
                             title="Matriz de composición anual del PGN <br><sup>Cifras en miles de millones de pesos</sup>")
             
-        fig.update_layout(width=1000, height=600)
+    fig.update_layout(width=1000, height=600)
             
-        st.plotly_chart(fig)
-    except:
-        st.warning("Not enough information.")
+    st.plotly_chart(fig)
+    
+    st.warning("Not enough information.")
 
 
 with tab3:
