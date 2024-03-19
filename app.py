@@ -177,7 +177,7 @@ with tab1:
     with col3:
         st.metric("Variación anualizada", f"{round(change * 100, 2)}%")
 
-    sub_proyecto = st.selectbox("Seleccione un objeto/proyecto: ", f_s_e_u_tg_c_sc_o['Subproyecto'].unique())
+    sub_proyecto = st.selectbox("Seleccione un subproyecto: ", f_s_e_u_tg_c_sc_o['Subproyecto'].unique())
 
     f_s_e_u_tg_c_sc_o_sp = f_s_e_u_tg_c_sc_o[f_s_e_u_tg_c_sc_o['Subproyecto'] == sub_proyecto]
     col1, col2, col3 = st.columns(3)
