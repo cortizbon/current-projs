@@ -175,6 +175,23 @@ with tab1:
         st.metric(f"Apropiación | {objeto} | 2024", round(tot_2024 / 1_000_000_000, 2))
 
     with col3:
+        st.metric("Variación anualizada", f"{round(change * 100, 2)}%")
+
+    sub_proyecto = st.selectbox("Seleccione un objeto/proyecto: ", f_s_e_u_tg_c_sc_o['Subproyecto'].unique())
+
+    f_s_e_u_tg_c_sc_o_sp = f_s_e_u_tg_c_sc_o[f_s_e_u_tg_c_sc_o['Subproyecto'] == sub_proyecto]
+    col1, col2, col3 = st.columns(3)
+    tot_2024 = f_s_e_u_tg_c_sc_o_sp[f_s_e_u_tg_c_sc_o_sp['Año'] == 2024]['Apropiación en precios corrientes'].sum()
+    tot_2019 = f_s_e_u_tg_c_sc_o_sp[f_s_e_u_tg_c_sc_o_sp['Año'] == 2019]['Apropiación en precios corrientes'].sum()
+
+    change = ((tot_2024 / tot_2019) ** (1 / (2024 - 2019)))- 1
+    with col1:
+        st.metric(f"Apropiación | {sub_proyecto} | 2019", round(tot_2019 / 1_000_000_000, 2))
+
+    with col2:
+        st.metric(f"Apropiación | {sub_proyecto} | 2024", round(tot_2024 / 1_000_000_000, 2))
+
+    with col3:
         st.metric("Variación anualizada", f"{round(change * 100, 2)}%")    
         
 with tab2:
