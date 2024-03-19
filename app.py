@@ -209,7 +209,6 @@ with tab2:
                                     'Unidad',
                                     'Tipo de gasto', 'Cuenta', 'Subcuenta'],
                             values='Apropiación en precios corrientes (cifras en miles en millones de pesos)',
-                            color='Sector',
                             title="Matriz de composición anual del PGN <br><sup>Cifras en miles de millones de pesos</sup>",
                             color_continuous_scale='Teal')
             
