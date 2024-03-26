@@ -15,7 +15,7 @@ st.set_page_config(layout='wide')
 st.title('PePE desagregado')
 
 
-df= pd.read_csv('datos_desagregados_2019_2024 - Sheet1.csv')
+df= pd.read_csv('datos_desagregados_2019_2024.csv')
 df['Apropiación en precios corrientes (cifras en miles en millones de pesos)'] = (df['Apropiación en precios corrientes'] /  1000_000_000).round(2)
 sectors = df['Sector'].unique()
 entities = df['Entidad'].unique()
@@ -81,33 +81,14 @@ with tab1:
     with col3:
         st.metric("Variación anualizada ", f"{round(change * 100, 2)}%")
 
-    # cambio porcentual por unidad
-
-    
-    unidad = st.selectbox("Seleccione una unidad: ", f_s_e['Unidad'].unique())
-
-    f_s_e_u = f_s_e[f_s_e['Unidad'] == unidad]
-    col1, col2, col3 = st.columns(3)
-    tot_2024 = f_s_e_u[f_s_e_u['Año'] == 2024]['Apropiación en precios corrientes'].sum()
-    tot_2019 = f_s_e_u[f_s_e_u['Año'] == 2019]['Apropiación en precios corrientes'].sum()
-
-    change = ((tot_2024 / tot_2019) ** (1 / (2024 - 2019)))- 1
-    with col1:
-        st.metric(f"Apropiación | {unidad} | 2019", round(tot_2019 / 1_000_000_000, 2))
-
-    with col2:
-        st.metric(f"Apropiación | {unidad} | 2024", round(tot_2024 / 1_000_000_000, 2))
-
-    with col3:
-        st.metric("Variación anualizada", f"{round(change * 100, 2)}%")
     # cambio porcentual por tipo de gasto
 
-    tipo_gasto = st.selectbox("Seleccione un tipo de gasto: ", f_s_e_u['Tipo de gasto'].unique())
+    tipo_gasto = st.selectbox("Seleccione un tipo de gasto: ", f_s_e['Tipo de gasto'].unique())
 
-    f_s_e_u_tg = f_s_e_u[f_s_e_u['Tipo de gasto'] == tipo_gasto]
+    f_s_e_tg = f_s_e[f_s_e['Tipo de gasto'] == tipo_gasto]
     col1, col2, col3 = st.columns(3)
-    tot_2024 = f_s_e_u_tg[f_s_e_u_tg['Año'] == 2024]['Apropiación en precios corrientes'].sum()
-    tot_2019 = f_s_e_u_tg[f_s_e_u_tg['Año'] == 2019]['Apropiación en precios corrientes'].sum()
+    tot_2024 = f_s_e_tg[f_s_e_tg['Año'] == 2024]['Apropiación en precios corrientes'].sum()
+    tot_2019 = f_s_e_tg[f_s_e_tg['Año'] == 2019]['Apropiación en precios corrientes'].sum()
 
     change = ((tot_2024 / tot_2019) ** (1 / (2024 - 2019)))- 1
     with col1:
@@ -122,12 +103,12 @@ with tab1:
 
     # cambio porcentual por cuenta
 
-    cuenta = st.selectbox("Seleccione una cuenta: ", f_s_e_u_tg['Cuenta'].unique())
+    cuenta = st.selectbox("Seleccione una cuenta: ", f_s_e_tg['Cuenta'].unique())
 
-    f_s_e_u_tg_c = f_s_e_u_tg[f_s_e_u_tg['Cuenta'] == cuenta]
+    f_s_e_tg_c = f_s_e_tg[f_s_e_tg['Cuenta'] == cuenta]
     col1, col2, col3 = st.columns(3)
-    tot_2024 = f_s_e_u_tg_c[f_s_e_u_tg_c['Año'] == 2024]['Apropiación en precios corrientes'].sum()
-    tot_2019 = f_s_e_u_tg_c[f_s_e_u_tg_c['Año'] == 2019]['Apropiación en precios corrientes'].sum()
+    tot_2024 = f_s_e_tg_c[f_s_e_tg_c['Año'] == 2024]['Apropiación en precios corrientes'].sum()
+    tot_2019 = f_s_e_tg_c[f_s_e_tg_c['Año'] == 2019]['Apropiación en precios corrientes'].sum()
 
     change = ((tot_2024 / tot_2019) ** (1 / (2024 - 2019)))- 1
     with col1:
@@ -141,12 +122,12 @@ with tab1:
 
     # subcuentas
     
-    subcuenta = st.selectbox("Seleccione una subcuenta: ", f_s_e_u_tg_c['Subcuenta'].unique())
+    subcuenta = st.selectbox("Seleccione una subcuenta: ", f_s_e_tg_c['Subcuenta'].unique())
 
-    f_s_e_u_tg_c_sc = f_s_e_u_tg_c[f_s_e_u_tg_c['Subcuenta'] == subcuenta]
+    f_s_e_tg_c_sc = f_s_e_tg_c[f_s_e_tg_c['Subcuenta'] == subcuenta]
     col1, col2, col3 = st.columns(3)
-    tot_2024 = f_s_e_u_tg_c_sc[f_s_e_u_tg_c_sc['Año'] == 2024]['Apropiación en precios corrientes'].sum()
-    tot_2019 = f_s_e_u_tg_c_sc[f_s_e_u_tg_c_sc['Año'] == 2019]['Apropiación en precios corrientes'].sum()
+    tot_2024 = f_s_e_tg_c_sc[f_s_e_tg_c_sc['Año'] == 2024]['Apropiación en precios corrientes'].sum()
+    tot_2019 = f_s_e_tg_c_sc[f_s_e_tg_c_sc['Año'] == 2019]['Apropiación en precios corrientes'].sum()
 
     change = ((tot_2024 / tot_2019) ** (1 / (2024 - 2019)))- 1
     with col1:
@@ -160,12 +141,12 @@ with tab1:
 
     # objeto
         
-    objeto = st.selectbox("Seleccione un objeto/proyecto: ", f_s_e_u_tg_c_sc['Objeto/proyecto'].unique())
+    objeto = st.selectbox("Seleccione un objeto/proyecto: ", f_s_e_tg_c_sc['Objeto/proyecto'].unique())
 
-    f_s_e_u_tg_c_sc_o = f_s_e_u_tg_c_sc[f_s_e_u_tg_c_sc['Objeto/proyecto'] == objeto]
+    f_s_e_tg_c_sc_o = f_s_e_tg_c_sc[f_s_e_tg_c_sc['Objeto/proyecto'] == objeto]
     col1, col2, col3 = st.columns(3)
-    tot_2024 = f_s_e_u_tg_c_sc_o[f_s_e_u_tg_c_sc_o['Año'] == 2024]['Apropiación en precios corrientes'].sum()
-    tot_2019 = f_s_e_u_tg_c_sc_o[f_s_e_u_tg_c_sc_o['Año'] == 2019]['Apropiación en precios corrientes'].sum()
+    tot_2024 = f_s_e_tg_c_sc_o[f_s_e_tg_c_sc_o['Año'] == 2024]['Apropiación en precios corrientes'].sum()
+    tot_2019 = f_s_e_tg_c_sc_o[f_s_e_tg_c_sc_o['Año'] == 2019]['Apropiación en precios corrientes'].sum()
 
     change = ((tot_2024 / tot_2019) ** (1 / (2024 - 2019)))- 1
     with col1:
@@ -177,12 +158,12 @@ with tab1:
     with col3:
         st.metric("Variación anualizada", f"{round(change * 100, 2)}%")
 
-    sub_proyecto = st.selectbox("Seleccione un subproyecto: ", f_s_e_u_tg_c_sc_o['Subproyecto'].unique())
+    sub_proyecto = st.selectbox("Seleccione un subproyecto: ", f_s_e_tg_c_sc_o['Subproyecto'].unique())
 
-    f_s_e_u_tg_c_sc_o_sp = f_s_e_u_tg_c_sc_o[f_s_e_u_tg_c_sc_o['Subproyecto'] == sub_proyecto]
+    f_s_e_tg_c_sc_o_sp = f_s_e_tg_c_sc_o[f_s_e_tg_c_sc_o['Subproyecto'] == sub_proyecto]
     col1, col2, col3 = st.columns(3)
-    tot_2024 = f_s_e_u_tg_c_sc_o_sp[f_s_e_u_tg_c_sc_o_sp['Año'] == 2024]['Apropiación en precios corrientes'].sum()
-    tot_2019 = f_s_e_u_tg_c_sc_o_sp[f_s_e_u_tg_c_sc_o_sp['Año'] == 2019]['Apropiación en precios corrientes'].sum()
+    tot_2024 = f_s_e_tg_c_sc_o_sp[f_s_e_tg_c_sc_o_sp['Año'] == 2024]['Apropiación en precios corrientes'].sum()
+    tot_2019 = f_s_e_tg_c_sc_o_sp[f_s_e_tg_c_sc_o_sp['Año'] == 2019]['Apropiación en precios corrientes'].sum()
 
     change = ((tot_2024 / tot_2019) ** (1 / (2024 - 2019)))- 1
     with col1:
@@ -205,8 +186,7 @@ with tab2:
 
     fig = px.treemap(filter_year, 
                             path=[px.Constant('PGN'), 'Sector', 
-                                    'Entidad', 
-                                    'Unidad',
+                                    'Entidad',
                                     'Tipo de gasto', 'Cuenta', 'Subcuenta'],
                             values='Apropiación en precios corrientes (cifras en miles en millones de pesos)',
                             title="Matriz de composición anual del PGN <br><sup>Cifras en miles de millones de pesos</sup>",
