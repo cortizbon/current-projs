@@ -194,9 +194,6 @@ with tab2:
     fig.update_layout(width=1000, height=600)
             
     st.plotly_chart(fig)
-    
-    st.warning("Not enough information.")
-
 
 with tab3:
     st.subheader("Descarga de dataset completo")
