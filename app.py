@@ -15,11 +15,10 @@ st.set_page_config(layout='wide')
 st.title('PePE desagregado')
 
 
-df= pd.read_csv('datos_desagregados_2019_2024.csv')
+df= pd.read_csv('datasets/datos_desagregados_2019_2024.csv')
 df['Apropiación en precios corrientes (cifras en miles en millones de pesos)'] = (df['Apropiación en precios corrientes'] /  1000_000_000).round(2)
 sectors = df['Sector'].unique()
 entities = df['Entidad'].unique()
-units = df['Unidad'].unique()
 tipo_gastos = df['Tipo de gasto'].unique()
 cuentas = df['Cuenta'].dropna().unique()
 subcuentas = df['Subcuenta'].dropna().unique()
