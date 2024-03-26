@@ -16,7 +16,7 @@ st.title('PePE desagregado')
 
 
 df= pd.read_csv('datasets/datos_desagregados_2019_2024.csv')
-df['Apropiación en precios corrientes (cifras en miles en millones de pesos)'] = (df['Apropiación en precios corrientes'] /  1000_000_000).round(2)
+df['Apropiación en precios corrientes (cifras en miles de millones de pesos)'] = (df['Apropiación en precios corrientes'] /  1000_000_000).round(2)
 sectors = df['Sector'].unique()
 entities = df['Entidad'].unique()
 tipo_gastos = df['Tipo de gasto'].unique()
@@ -186,8 +186,8 @@ with tab2:
     fig = px.treemap(filter_year, 
                             path=[px.Constant('PGN'), 'Sector', 
                                     'Entidad',
-                                    'Tipo de gasto', 'Cuenta', 'Subcuenta'],
-                            values='Apropiación en precios corrientes (cifras en miles en millones de pesos)',
+                                    'Tipo de gasto', 'Cuenta'],
+                            values='Apropiación en precios corrientes (cifras en miles de millones de pesos)',
                             title="Matriz de composición anual del PGN <br><sup>Cifras en miles de millones de pesos</sup>",
                             color_continuous_scale='Teal')
             
