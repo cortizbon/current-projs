@@ -15,7 +15,7 @@ st.set_page_config(layout='wide')
 st.title('PePE desagregado')
 
 
-df= pd.read_csv('df_tot.csv')
+df= pd.read_csv('datos_desagregados_2019_2024 - Sheet1.csv')
 df['Apropiación en precios corrientes (cifras en miles en millones de pesos)'] = (df['Apropiación en precios corrientes'] /  1000_000_000).round(2)
 sectors = df['Sector'].unique()
 entities = df['Entidad'].unique()
