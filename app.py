@@ -43,6 +43,15 @@ with tab1:
     with col3:
         st.metric("Variación anualizada", f"{round(change * 100, 2)}%")
 
+    piv = df.pivot_table(index='Sector',
+                         columns='Año',
+                         values='Apropiación en precios corrientes',
+                         aggfunc='sum')
+    piv['diff'] = piv[2024] - piv[2019]
+    fig, ax = plt.subplots(1, 1)
+    piv.sort_values(by='diff').tail(5)['diff'].plot(kind='barh',
+                                                    ax=ax)
+    st.pyplot(fig)
     # cambio porcentual por sector
 
     sector = st.selectbox("Seleccione un sector: ", sectors)
@@ -62,6 +71,16 @@ with tab1:
     with col3:
         st.metric(f"Variación anualizada {sector}", f"{round(change * 100, 2)}%")
 
+    piv = f_s.pivot_table(index='Entidad',
+                         columns='Año',
+                         values='Apropiación en precios corrientes',
+                         aggfunc='sum')
+    piv['diff'] = piv[2024] - piv[2019]
+    fig, ax = plt.subplots(1, 1)
+    piv.sort_values(by='diff').tail(5)['diff'].plot(kind='barh',
+                                                    ax=ax)
+    st.pyplot(fig)
+
     # cambio porcentual por entidad
     entidad = st.selectbox("Seleccione una entidad: ", f_s['Entidad'].unique())
 
@@ -79,6 +98,16 @@ with tab1:
 
     with col3:
         st.metric("Variación anualizada ", f"{round(change * 100, 2)}%")
+
+    piv = f_s_e.pivot_table(index='Tipo de gasto',
+                         columns='Año',
+                         values='Apropiación en precios corrientes',
+                         aggfunc='sum')
+    piv['diff'] = piv[2024] - piv[2019]
+    fig, ax = plt.subplots(1, 1)
+    piv.sort_values(by='diff').tail(5)['diff'].plot(kind='barh',
+                                                    ax=ax)
+    st.pyplot(fig)
 
     # cambio porcentual por tipo de gasto
 
@@ -99,7 +128,15 @@ with tab1:
     with col3:
         st.metric("Variación anualizada", f"{round(change * 100, 2)}%")
     
-
+    piv = f_s_e_tg.pivot_table(index='Cuenta',
+                         columns='Año',
+                         values='Apropiación en precios corrientes',
+                         aggfunc='sum')
+    piv['diff'] = piv[2024] - piv[2019]
+    fig, ax = plt.subplots(1, 1)
+    piv.sort_values(by='diff').tail(5)['diff'].plot(kind='barh',
+                                                    ax=ax)
+    st.pyplot(fig)
     # cambio porcentual por cuenta
 
     cuenta = st.selectbox("Seleccione una cuenta: ", f_s_e_tg['Cuenta'].unique())
@@ -118,6 +155,16 @@ with tab1:
 
     with col3:
         st.metric("Variación anualizada", f"{round(change * 100, 2)}%")
+
+    piv = f_s_e_tg_c.pivot_table(index='Subcuenta',
+                         columns='Año',
+                         values='Apropiación en precios corrientes',
+                         aggfunc='sum')
+    piv['diff'] = piv[2024] - piv[2019]
+    fig, ax = plt.subplots(1, 1)
+    piv.sort_values(by='diff').tail(5)['diff'].plot(kind='barh',
+                                                    ax=ax)
+    st.pyplot(fig)
 
     # subcuentas
     
@@ -138,6 +185,16 @@ with tab1:
     with col3:
         st.metric("Variación anualizada", f"{round(change * 100, 2)}%")
 
+    piv = f_s_e_tg_c_sc.pivot_table(index='Objeto/proyecto',
+                         columns='Año',
+                         values='Apropiación en precios corrientes',
+                         aggfunc='sum')
+    piv['diff'] = piv[2024] - piv[2019]
+    fig, ax = plt.subplots(1, 1)
+    piv.sort_values(by='diff').tail(5)['diff'].plot(kind='barh',
+                                                    ax=ax)
+    st.pyplot(fig)
+
     # objeto
         
     objeto = st.selectbox("Seleccione un objeto/proyecto: ", f_s_e_tg_c_sc['Objeto/proyecto'].unique())
@@ -156,6 +213,8 @@ with tab1:
 
     with col3:
         st.metric("Variación anualizada", f"{round(change * 100, 2)}%")
+
+
 
     sub_proyecto = st.selectbox("Seleccione un subproyecto: ", f_s_e_tg_c_sc_o['Subproyecto'].unique())
 
