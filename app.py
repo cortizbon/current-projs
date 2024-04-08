@@ -5,6 +5,7 @@ import plotly.express as px
 import matplotlib.pyplot as plt 
 import pywaffle as pwf
 from io import BytesIO
+import plotly.graph_objects as go
 
 from utils import create_dataframe_sankey
 
@@ -16,7 +17,6 @@ DIC_COLORES = {'verde':["#009966"],
 st.set_page_config(layout='wide')
 st.title('PePE desagregado')
 
-"#F9F9F9" "#FFE9C5"
 df = pd.read_csv('datasets/datos_desagregados_2019_2024.csv')
 df['Apropiación en precios corrientes (cifras en miles de millones de pesos)'] = (df['Apropiación en precios corrientes'] /  1000_000_000).round(2)
 
@@ -28,10 +28,9 @@ cuentas = df['Cuenta'].dropna().unique()
 subcuentas = df['Subcuenta'].dropna().unique()
 projects = df['Objeto/proyecto'].dropna().unique()
 
-tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs(['PEPE desagregado', 
+tab1, tab2, tab3, tab4, tab5= st.tabs(['PEPE desagregado', 
                                         'Treemap', 
-                                        'Descarga de datos', 
-                                        'SankeyDiagrams',
+                                        'Descarga de datos',
                                         "Lollipop",
                                         "Anteproyecto - 2025"])
 
@@ -217,13 +216,8 @@ with tab3:
                     data = binary_output.getvalue(),
                     file_name = 'datos_desagregados_2019_2024.xlsx')
     
-import plotly.graph_objects as go
+
 with tab4:
-    fig  = go.Figure(data=go.Sankey(
-
-    ))
-
-with tab5:
     st.header("Cambio 2019 - 2024")
     st.subheader("Cambio por sector")
     data = df.pivot_table(index='Sector',
@@ -323,13 +317,13 @@ with tab5:
 
     st.plotly_chart(fig)
 
-with tab6:
+with tab5:
     st.header("Anteproyecto")
 
     st.subheader("Treemap")
 
     fig = px.treemap(df2, 
-                            path=[px.Constant('Anteproyecto'), 'ENTIDAD', 
+                            path=[px.Constant('Anteproyecto'), 'Sector', 'ENTIDAD','Tipo de gasto', 
                                     'CONCEPTO'],
                             values='TOTAL',
                             title="Matriz de composición anual del Anteproyecto <br><sup>Cifras en millones de pesos</sup>",
@@ -339,14 +333,15 @@ with tab6:
             
     st.plotly_chart(fig)
 
-    st.subheader("Flujo del gasto")
-    lista = ['ENTIDAD', 'CONCEPTO']
+    st.subheader("Flujo del gasto por entidad")
+    lista = ['ENTIDAD', 'Tipo de gasto', 'CONCEPTO']
 
     top_10 = df2.groupby('ENTIDAD')['TOTAL'].sum().reset_index().sort_values(by='TOTAL', ascending=False).head(10)['ENTIDAD']
 
     top_10_df = df2[df2['ENTIDAD'].isin(top_10)]
 
-    rev_info, conc = create_dataframe_sankey(top_10_df, 'TOTAL',*lista)
+    dicti = {'source':['Inversion','Servicio de la deuda']}
+    rev_info, conc = create_dataframe_sankey(top_10_df, 'TOTAL',*lista, **dicti)
     fig = go.Figure(data=[go.Sankey(
     node = dict(
       pad = 15,
@@ -362,6 +357,32 @@ with tab6:
     ))])
 
     fig.update_layout(title_text="Flujo de gasto", font_size=10, width=1000, height=600)
+    st.plotly_chart(fig)
+
+    st.subheader("Flujo del gasto por sector")
+    lista = ['Sector', 'Tipo de gasto', 'CONCEPTO']
+
+    top_10 = df2.groupby('Sector')['TOTAL'].sum().reset_index().sort_values(by='TOTAL', ascending=False).head(10)['Sector']
+
+    top_10_df = df2[df2['Sector'].isin(top_10)]
+
+    dicti = {'source':['Inversion','Servicio de la deuda']}
+    rev_info, conc = create_dataframe_sankey(top_10_df, 'TOTAL',*lista, **dicti)
+    fig = go.Figure(data=[go.Sankey(
+    node = dict(
+      pad = 15,
+      thickness = 20,
+      line = dict(color = "#2635bf", width = 0.5),
+      label = list(rev_info.keys()),
+      color = "#2635bf"
+    ),
+    link = dict(
+      source = conc['source'], # indices correspond to labels, eg A1, A2, A1, B1, ...
+      target = conc['target'],
+      value = conc['value']
+    ))])
+
+    fig.update_layout(title_text="Flujo de gasto por sector", font_size=10, width=1000, height=600)
     st.plotly_chart(fig)
 
 
