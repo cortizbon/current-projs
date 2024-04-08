@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import pywaffle as pwf
 from io import BytesIO
 import plotly.graph_objects as go
+from plotly.subplots import make_subplots
 
 from utils import create_dataframe_sankey
 
@@ -14,6 +15,9 @@ DIC_COLORES = {'verde':["#009966"],
                'az_verd': ["#CBECEF", "#81D3CD", "#0FB7B3", "#009999"],
                'ax_viol': ["#D9D9ED", "#2F399B", "#1A1F63", "#262947"],
                'ofiscal': ["#F9F9F9", "#2635bf"]}
+dict_gasto = {'Funcionamiento':DIC_COLORES['az_verd'][2],
+              'Deuda':DIC_COLORES['ax_viol'][1],
+              'Inversión':DIC_COLORES['ro_am_na'][3]}
 st.set_page_config(layout='wide')
 st.title('PePE desagregado')
 
@@ -28,11 +32,12 @@ cuentas = df['Cuenta'].dropna().unique()
 subcuentas = df['Subcuenta'].dropna().unique()
 projects = df['Objeto/proyecto'].dropna().unique()
 
-tab1, tab2, tab3, tab4, tab5= st.tabs(['PEPE desagregado', 
+tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs(['PEPE desagregado', 
                                         'Treemap', 
                                         'Descarga de datos',
                                         "Lollipop",
-                                        "Anteproyecto - 2025"])
+                                        "Anteproyecto - 2025",
+                                        'Actualización 2025'])
 
 with tab1:
     # cambio porcentual general
@@ -388,6 +393,8 @@ with tab5:
 
 
 
+
+
     st.subheader("Descarga de datos")
 
 
@@ -396,6 +403,348 @@ with tab5:
     st.download_button(label = 'Descargar datos de anteproyecto',
                     data = binary_output.getvalue(),
                     file_name = 'datos_agregados_anteproyecto_2025.xlsx')
+
+with tab6:
+
+    data = pd.read_csv('datasets/datos_def_2025.csv')
+
+    st.subheader('General')
+
+    piv_2025 = data.groupby('Año')['Apropiación a precios constantes (2025)'].sum().reset_index()
+
+    #piv_2024['Apropiación a precios constantes (2024)'] /= 1000
+
+    fig = make_subplots(rows=1, cols=2, x_title='Año',  )
+    
+    fig.add_trace(
+        go.Line(
+            x=piv_2025['Año'], y=piv_2025['Apropiación a precios constantes (2025)'], 
+            name='Apropiación a precios constantes (2025)', line=dict(color=DIC_COLORES['ax_viol'][1])
+        ),
+        row=1, col=1
+    )
+
+    piv_tipo_gasto = (data
+                      .groupby(['Año', 'Tipo de gasto'])['Apropiación a precios constantes (2025)']
+                      .sum()
+                      .reset_index())
+    piv_tipo_gasto['total'] = piv_tipo_gasto.groupby(['Año'])['Apropiación a precios constantes (2025)'].transform('sum')
+
+    piv_tipo_gasto['%'] = ((piv_tipo_gasto['Apropiación a precios constantes (2025)'] / piv_tipo_gasto['total']) * 100).round(2)
+
+        
+    for i, group in piv_tipo_gasto.groupby('Tipo de gasto'):
+        fig.add_trace(go.Bar(
+            x=group['Año'],
+            y=group['%'],
+            name=i, marker_color=dict_gasto[i]
+        ), row=1, col=2)
+
+    fig.update_layout(barmode='stack', hovermode='x unified')
+    fig.update_layout(width=1000, height=500, legend=dict(orientation="h",
+    yanchor="bottom",
+    y=1.02,
+    xanchor="right",
+    x=1), title='Histórico general <br><sup>Cifras en miles de millones de pesos</sup>', yaxis_tickformat='.0f')
+
+
+    st.plotly_chart(fig)
+
+
+
+
+
+    st.subheader('Sector')
+
+    sectors = data['Sector'].unique()
+
+    sector = st.selectbox("Seleccione el sector", sectors, key=2)
+
+    filter_sector = data[data['Sector'] == sector]
+
+    pivot_sector = filter_sector.pivot_table(index='Año', values='Apropiación a precios constantes (2025)', aggfunc='sum').reset_index()
+
+    fig = make_subplots(rows=1, cols=2, x_title='Año', shared_yaxes=True)
+    
+    fig.add_trace(
+        go.Line(
+            x=pivot_sector['Año'], y=pivot_sector['Apropiación a precios constantes (2025)'], 
+            name='Apropiación a precios constantes (2025)', line=dict(color=DIC_COLORES['ax_viol'][1])
+        ),
+        row=1, col=1
+    )
+
+    piv_tipo_gasto_sector = (filter_sector
+                      .groupby(['Año', 'Tipo de gasto'])['Apropiación a precios constantes (2025)']
+                      .sum()
+                      .reset_index())
+    for i, group in piv_tipo_gasto_sector.groupby('Tipo de gasto'):
+        fig.add_trace(go.Bar(
+            x=group['Año'],
+            y=group['Apropiación a precios constantes (2025)'],
+            name=i, marker_color=dict_gasto[i]
+        ), row=1, col=2)
+
+    fig.update_layout(barmode='stack', hovermode='x unified')
+
+
+    fig.update_layout(width=1000, height=500, legend=dict(orientation="h",
+    yanchor="bottom",
+    y=1.02,
+    xanchor="right",
+    x=1), title=f"{sector} <br><sup>Cifras en miles de millones de pesos</sup>", yaxis_tickformat='.0f')
+
+    st.plotly_chart(fig)
+
+    st.subheader(f"Variación histórica por sector: {sector}")
+
+    pivot_sector = pivot_sector.set_index('Año')
+    pivot_sector['pct'] = pivot_sector['Apropiación a precios constantes (2025)'].pct_change()
+    pivot_sector['pct'] = (pivot_sector['pct'] * 100).round(2)
+    den = max(pivot_sector.index) - min(pivot_sector.index)
+    pivot_sector['CAGR'] = ((pivot_sector.loc[max(pivot_sector.index), 'Apropiación a precios constantes (2025)'] / pivot_sector.loc[min(pivot_sector.index), 'Apropiación a precios constantes (2025)']) ** (1/12)) - 1
+    pivot_sector['CAGR'] = (pivot_sector['CAGR'] * 100).round(2)
+    pivot_sector = pivot_sector.reset_index()
+
+    fig = make_subplots(rows=1, cols=2, x_title='Año')
+
+    fig.add_trace(
+            go.Bar(x=pivot_sector['Año'], y=pivot_sector['Apropiación a precios constantes (2025)'],
+                name='Apropiación a precios constantes (2025)', marker_color=DIC_COLORES['ofiscal'][1]),
+            row=1, col=1, 
+        )
+
+    fig.add_trace(go.Line(
+                x=pivot_sector['Año'], 
+                y=pivot_sector['pct'], 
+                name='Variación porcentual (%)', line=dict(color=DIC_COLORES['ro_am_na'][1])
+            ),
+            row=1, col=2
+        )
+    fig.add_trace(
+            go.Line(
+                x=pivot_sector['Año'], y=pivot_sector['CAGR'], name='Variación anualizada (%)', line=dict(color=DIC_COLORES['verde'][0])
+            ),
+            row=1, col=2
+        )
+    fig.update_layout(width=1000, height=500, legend=dict(orientation="h",
+        yanchor="bottom",
+        y=1.02,
+        xanchor="right",
+        x=1), hovermode='x unified', yaxis_tickformat='.0f', title=f"{sector} <br><sup>Cifras en miles de millones de pesos</sup>")
+
+    st.plotly_chart(fig)
+
+
+    st.subheader('Entidad')
+
+ 
+    entities_sector = filter_sector['Entidad'].unique()
+    entidad = st.selectbox("Seleccione la entidad",
+                            entities_sector)
+    
+    filter_entity = filter_sector[filter_sector['Entidad'] == entidad]
+
+    pivot_entity = filter_entity.pivot_table(index='Año',
+                                           values='Apropiación a precios constantes (2025)',
+                                           aggfunc='sum')
+    
+    pivot_entity = pivot_entity.reset_index()
+
+    fig = make_subplots(rows=1, cols=2, x_title='Año', shared_yaxes=True)
+    
+    fig.add_trace(
+        go.Line(
+            x=pivot_entity['Año'], y=pivot_entity['Apropiación a precios constantes (2025)'], 
+            name='Apropiación a precios constantes (2025)', line=dict(color=DIC_COLORES['ax_viol'][1])
+        ),
+        row=1, col=1
+    )
+    piv_tipo_gasto_entity = (filter_entity
+                      .groupby(['Año', 'Tipo de gasto'])['Apropiación a precios constantes (2025)']
+                      .sum()
+                      .reset_index())
+    for i, group in piv_tipo_gasto_entity.groupby('Tipo de gasto'):
+        fig.add_trace(go.Bar(
+            x=group['Año'],
+            y=group['Apropiación a precios constantes (2025)'],
+            name=i, marker_color=dict_gasto[i]
+        ), row=1, col=2)
+
+    fig.update_layout(barmode='stack', hovermode='x unified')
+
+    fig.update_layout(width=1000, height=500, legend=dict(orientation="h",
+    yanchor="bottom",
+    y=1.02,
+    xanchor="right",
+    x=1), title=f"{entidad} <br><sup>Cifras en miles de millones de pesos</sup>", yaxis_tickformat='.0f')
+
+    st.plotly_chart(fig)
+
+    if pivot_entity['Año'].nunique() <=1:
+        st.warning(f"La entidad {entidad} solo tiene información de un año.")
+        st.stop()
+
+    st.subheader(f"Variación histórica por entidad: {entidad}")
+
+    pivot_entity = pivot_entity.set_index('Año')
+    pivot_entity['pct'] = pivot_entity['Apropiación a precios constantes (2025)'].pct_change()
+    pivot_entity['pct'] = (pivot_entity['pct'] * 100).round(2)
+    pivot_entity['CAGR'] = ((pivot_entity.loc[max(pivot_entity.index), 'Apropiación a precios constantes (2025)'] / pivot_entity.loc[min(pivot_entity.index), 'Apropiación a precios constantes (2025)'] ) ** (1/12)) - 1
+    pivot_entity['CAGR'] = (pivot_entity['CAGR'] * 100).round(2)
+    pivot_entity = pivot_entity.reset_index()
+
+    fig = make_subplots(rows=1, cols=2, x_title='Año')
+
+    fig.add_trace(
+        go.Bar(x=pivot_entity['Año'], y=pivot_entity['Apropiación a precios constantes (2025)'],
+               name='Apropiación a precios constantes (2025)', marker_color=DIC_COLORES['ofiscal'][1]),
+        row=1, col=1, 
+    )
+
+    fig.add_trace(go.Line(
+            x=pivot_entity['Año'], 
+            y=pivot_entity['pct'], 
+            name='Variación porcentual (%)', line=dict(color=DIC_COLORES['ro_am_na'][1])
+        ),
+        row=1, col=2
+    )
+    fig.add_trace(
+        go.Line(
+            x=pivot_entity['Año'], y=pivot_entity['CAGR'], name='Variación anualizada (%)', line=dict(color=DIC_COLORES['verde'][0])
+        ),
+        row=1, col=2
+    )
+    fig.update_layout(width=1000, height=500, legend=dict(orientation="h",
+    yanchor="bottom",
+    y=1.02,
+    xanchor="right",
+    x=1), hovermode='x unified', yaxis_tickformat='.0f', title=f"{entidad} <br><sup>Cifras en miles de millones de pesos</sup>")
+
+    st.plotly_chart(fig)
+
+    st.subheader("Cambio de gasto por sector (2019 - 2025)")
+
+    data2 = data.pivot_table(index='Sector',
+               columns='Año',
+               values='Apropiación a precios constantes (2025)',
+               aggfunc='sum').sort_values(by=2025).dropna().tail(15).div(1_000_000_000).round(2).reset_index()
+
+    my_range = range(1, len(data2['Sector']) + 1)
+
+    trace1 = go.Scatter(
+        x=data2[2025],
+        y=list(my_range),
+        mode='markers',
+        name='2025',
+        hovertext=data2['Sector'],
+        hoverinfo='text+x',
+        marker_color="#2635bf",
+        marker_size=10
+    )
+    trace2 = go.Scatter(
+        x=data2[2019],
+        y=list(my_range),
+        mode='markers',
+        name='2019',
+        hovertext=data2['Sector'],
+        hoverinfo='text+x',
+        marker_color="#D8841C",
+        marker_size=10
+    )
+
+    fig = go.Figure()
+    fig.add_trace(trace1)
+    fig.add_trace(trace2)
+
+
+    fig.update_layout(
+        title='Cambio del gasto por sector (2019 - 2025)',
+        xaxis_title='Gasto (miles de millones de pesos)',
+        yaxis_title='',
+        yaxis=dict(tickvals=list(my_range), ticktext=["" for i in my_range]),
+        xaxis_tickformat="4.",
+        xaxis_showgrid=False,
+        yaxis_showgrid=False,
+        width=1000, height=600)
+    for i, j, k in zip(my_range, data2[2019], data2[2025]):
+        fig.add_shape(type='line', x0=j, x1=k, y0=i, y1=i, line_color="#2635bf", line_width=0.5) 
+
+    st.plotly_chart(fig)
+
+    st.subheader("Cambio de gasto por entidad (2019 - 2025)")
+
+
+    data2 = data.pivot_table(index='Entidad',
+               columns='Año',
+               values='Apropiación a precios constantes (2025)',
+               aggfunc='sum').sort_values(by=2025).dropna().tail(15).div(1_000_000_000).round(2).reset_index()
+
+    my_range = range(1, len(data2['Entidad']) + 1)
+
+    trace1 = go.Scatter(
+        x=data2[2025],
+        y=list(my_range),
+        mode='markers',
+        name='2025',
+        hovertext=data2['Entidad'],
+        hoverinfo='text+x',
+        marker_color="#2635bf",
+        marker_size=10
+    )
+    
+    trace2 = go.Scatter(
+        x=data2[2019],
+        y=list(my_range),
+        mode='markers',
+        name='2019',
+        hovertext=data2['Entidad'],
+        hoverinfo='text+x',
+        marker_color="#D8841C",
+        marker_size=10
+    )
+
+    fig = go.Figure()
+    fig.add_trace(trace1)
+    fig.add_trace(trace2)
+
+
+    fig.update_layout(
+        title='Cambio del gasto por entidad (2019 - 2025)',
+        xaxis_title='Gasto (miles de millones de pesos)',
+        yaxis_title='',
+        yaxis=dict(tickvals=list(my_range), ticktext=["" for i in my_range]),
+        xaxis_tickformat="4.",
+        xaxis_showgrid=False,
+        yaxis_showgrid=False,
+        width=1000, height=600)
+    for i, j, k in zip(my_range, data2[2019], data2[2025]):
+        fig.add_shape(type='line', x0=j, x1=k, y0=i, y1=i, line_color="#2635bf", line_width=0.5) 
+ 
+
+    st.plotly_chart(fig)
+
+
+
+    
+
+
+
+
+
+
+
+
+    st.subheader("Descarga de datos")
+
+
+
+
+    binary_output = BytesIO()
+    data.to_excel(binary_output, index=False)
+    st.download_button(label = 'Descargar datos actualizados',
+                    data = binary_output.getvalue(),
+                    file_name = 'datos_def_2025.xlsx')
 
 
 
