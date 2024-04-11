@@ -32,12 +32,13 @@ cuentas = df['Cuenta'].dropna().unique()
 subcuentas = df['Subcuenta'].dropna().unique()
 projects = df['Objeto/proyecto'].dropna().unique()
 
-tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs(['PEPE desagregado', 
+tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs(['PEPE desagregado', 
                                         'Treemap', 
                                         'Descarga de datos',
                                         "Lollipop",
                                         "Anteproyecto - 2025",
-                                        'Actualización 2025'])
+                                        'Actualización 2025',
+                                        'Diccionario'])
 
 with tab1:
     # cambio porcentual general
@@ -746,7 +747,53 @@ with tab6:
                     data = binary_output.getvalue(),
                     file_name = 'datos_def_2025.xlsx')
 
+with tab7:
 
+    import json 
+
+    with open("dictios/dic_entities.json") as f:
+        dic_entities = json.load(f)
+
+    with open("dictios/dic_sec_ents.json") as f:
+        dic_sec_ents = json.load(f)
+
+    with open("dictios/dic_sector.json") as f:
+        dic_sector = json.load(f)
+    
+    df = pd.Series(dic_entities).reset_index()
+    df.columns = ['Código de entidad', 'Entidad']
+    df['Código de sector'] = df['Código de entidad'].map(dic_sec_ents)
+    df['Código de sector'] = df['Código de sector'].astype(str)
+    df['Sector'] = df['Código de sector'].map(dic_sector)
+
+
+
+    st.subheader('Buscar por entidad:')
+    entidad = st.selectbox("Seleccione la entidad: ",  df['Entidad'].unique().tolist())
+
+    filtro_entidad = df[df['Entidad'] == entidad]
+
+    st.write(f"El sector asociado a esta entidad es: {filtro_entidad['Sector'].unique()[0]}")
+
+    st.divider()
+
+    st.subheader("Buscar por sector")
+
+    
+
+    sector = st.selectbox("Seleccione el sector: ", df['Sector'].unique().tolist())
+    filtro_sector = df[df['Sector'] == sector]
+
+    st.write(f"Estas son las entidades del sector: {sector}")
+
+    st.dataframe(filtro_sector[['Código de entidad', 'Entidad']])
+    st.divider()
+
+    st.subheader("Buscar por coincidencias")
+
+    text = st.text_input("Escriba una palabra o varias que hagan parte del nombre de la entidad. ")
+    
+    st.dataframe(df[df['Entidad'].str.lower().str.contains(text.lower().strip())])
 
 
 
