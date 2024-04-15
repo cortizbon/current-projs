@@ -32,13 +32,14 @@ cuentas = df['Cuenta'].dropna().unique()
 subcuentas = df['Subcuenta'].dropna().unique()
 projects = df['Objeto/proyecto'].dropna().unique()
 
-tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs(['PEPE desagregado', 
+tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8 = st.tabs(['PEPE desagregado', 
                                         'Treemap', 
                                         'Descarga de datos',
                                         "Lollipop",
                                         "Anteproyecto - 2025",
                                         'Actualización 2025',
-                                        'Diccionario'])
+                                        'Diccionario',
+                                        'Convertir datos'])
 
 with tab1:
     # cambio porcentual general
@@ -794,6 +795,22 @@ with tab7:
     text = st.text_input("Escriba una palabra o varias que hagan parte del nombre de la entidad. ")
     
     st.dataframe(df[df['Entidad'].str.lower().str.contains(text.lower().strip())])
+
+with tab8:
+    st.subheader("Convertir datos csv a excel")
+
+    uploaded_file = st.file_uploader("Cargue un doc CSV:")
+    if uploaded_file is not None:
+        dataframe = pd.read_csv(uploaded_file)
+        st.write(dataframe)
+        binary_output = BytesIO()
+        dataframe.to_excel(binary_output, index=False)
+        st.download_button(label = 'Descargar datos convertidos',
+                        data = binary_output.getvalue(),
+                        file_name = 'datos_convertidos.xlsx')
+
+    
+
 
 
 
