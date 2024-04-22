@@ -24,6 +24,7 @@ st.title('PePE desagregado')
 df = pd.read_csv('datasets/datos_desagregados_2019_2024.csv')
 df['Apropiación en precios corrientes (cifras en miles de millones de pesos)'] = (df['Apropiación en precios corrientes'] /  1000_000_000).round(2)
 
+test_df = pd.read_csv('datasets/dataset_192425.csv')
 df2 = pd.read_csv('datasets/anteproyecto_2025.csv')
 sectors = df['Sector'].unique()
 entities = df['Entidad'].unique()
@@ -44,16 +45,29 @@ tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8 = st.tabs(['PEPE desagregado',
 with tab1:
     # cambio porcentual general
 
-    col1, col2, col3 = st.columns(3)
-    tot_2024 = df[df['Año'] == 2024]['Apropiación en precios corrientes'].sum()
-    tot_2019 = df[df['Año'] == 2019]['Apropiación en precios corrientes'].sum()
+    col1, col2 = st.columns(2)
 
-    change = ((tot_2024 / tot_2019) ** (1 / (2024 - 2019)))- 1
     with col1:
-        st.metric(f"Apropiación 2019", round(tot_2019 / 1_000_000_000, 2))
+        year_base = st.selectbox("Seleccione el año base: ", test_df['Año'].unique(), 0)
 
     with col2:
-        st.metric(f"Apropiación 2024", round(tot_2024 / 1_000_000_000, 2))
+        year_vs = st.selectbox("Seleccione el año a comparar: ", test_df['Año'].unique(), 1)
+    df = test_df.copy()
+
+    if year_vs < year_base:
+        st.warning("El año a comparar debe ser mayor o igual al año base.")
+        st.stop()
+
+    col1, col2, col3 = st.columns(3)
+    tot_2024 = df[df['Año'] == year_vs]['Apropiación en precios constantes (2025)'].sum()
+    tot_2019 = df[df['Año'] == year_base]['Apropiación en precios constantes (2025)'].sum()
+
+    change = ((tot_2024 / tot_2019) ** (1 / (year_vs - year_base)))- 1
+    with col1:
+        st.metric(f"Apropiación {year_base}", round(tot_2019 / 1_000_000_000, 2))
+
+    with col2:
+        st.metric(f"Apropiación {year_vs}", round(tot_2024 / 1_000_000_000, 2))
 
     with col3:
         st.metric("Variación anualizada", f"{round(change * 100, 2)}%")
@@ -64,15 +78,15 @@ with tab1:
 
     f_s = df[df['Sector'] == sector]
     col1, col2, col3 = st.columns(3)
-    tot_2024 = f_s[f_s['Año'] == 2024]['Apropiación en precios corrientes'].sum()
-    tot_2019 = f_s[f_s['Año'] == 2019]['Apropiación en precios corrientes'].sum()
+    tot_2024 = f_s[f_s['Año'] == year_vs]['Apropiación en precios constantes (2025)'].sum()
+    tot_2019 = f_s[f_s['Año'] == year_base]['Apropiación en precios constantes (2025)'].sum()
 
-    change = ((tot_2024 / tot_2019) ** (1 / (2024 - 2019)))- 1
+    change = ((tot_2024 / tot_2019) ** (1 / (year_vs - year_base)))- 1
     with col1:
-        st.metric(f"Apropiación | {sector} | 2019", round(tot_2019 / 1_000_000_000, 2))
+        st.metric(f"Apropiación | {sector} | {year_base}", round(tot_2019 / 1_000_000_000, 2))
 
     with col2:
-        st.metric(f"Apropiación | {sector} | 2024", round(tot_2024 / 1_000_000_000, 2))
+        st.metric(f"Apropiación | {sector} | {year_vs}", round(tot_2024 / 1_000_000_000, 2))
 
     with col3:
         st.metric(f"Variación anualizada {sector}", f"{round(change * 100, 2)}%")
@@ -83,15 +97,15 @@ with tab1:
 
     f_s_e = f_s[f_s['Entidad'] == entidad]
     col1, col2, col3 = st.columns(3)
-    tot_2024 = f_s_e[f_s_e['Año'] == 2024]['Apropiación en precios corrientes'].sum()
-    tot_2019 = f_s_e[f_s_e['Año'] == 2019]['Apropiación en precios corrientes'].sum()
+    tot_2024 = f_s_e[f_s_e['Año'] == year_vs]['Apropiación en precios constantes (2025)'].sum()
+    tot_2019 = f_s_e[f_s_e['Año'] == year_base]['Apropiación en precios constantes (2025)'].sum()
 
     change = ((tot_2024 / tot_2019) ** (1 / (2024 - 2019)))- 1
     with col1:
-        st.metric(f"Apropiación | {entidad} | 2019", round(tot_2019 / 1_000_000_000, 2))
+        st.metric(f"Apropiación | {entidad} | {year_base}", round(tot_2019 / 1_000_000_000, 2))
 
     with col2:
-        st.metric(f"Apropiación | {entidad} | 2024", round(tot_2024 / 1_000_000_000, 2))
+        st.metric(f"Apropiación | {entidad} | {year_vs}", round(tot_2024 / 1_000_000_000, 2))
 
     with col3:
         st.metric("Variación anualizada ", f"{round(change * 100, 2)}%")
@@ -103,15 +117,15 @@ with tab1:
 
     f_s_e_tg = f_s_e[f_s_e['Tipo de gasto'] == tipo_gasto]
     col1, col2, col3 = st.columns(3)
-    tot_2024 = f_s_e_tg[f_s_e_tg['Año'] == 2024]['Apropiación en precios corrientes'].sum()
-    tot_2019 = f_s_e_tg[f_s_e_tg['Año'] == 2019]['Apropiación en precios corrientes'].sum()
+    tot_2024 = f_s_e_tg[f_s_e_tg['Año'] == year_vs]['Apropiación en precios constantes (2025)'].sum()
+    tot_2019 = f_s_e_tg[f_s_e_tg['Año'] == year_base]['Apropiación en precios constantes (2025)'].sum()
 
-    change = ((tot_2024 / tot_2019) ** (1 / (2024 - 2019)))- 1
+    change = ((tot_2024 / tot_2019) ** (1 / (year_vs - year_base)))- 1
     with col1:
-        st.metric(f"Apropiación | {tipo_gasto} | 2019", round(tot_2019 / 1_000_000_000, 2))
+        st.metric(f"Apropiación | {tipo_gasto} | {year_base}", round(tot_2019 / 1_000_000_000, 2))
 
     with col2:
-        st.metric(f"Apropiación | {tipo_gasto} | 2024", round(tot_2024 / 1_000_000_000, 2))
+        st.metric(f"Apropiación | {tipo_gasto} | {year_vs}", round(tot_2024 / 1_000_000_000, 2))
 
     with col3:
         st.metric("Variación anualizada", f"{round(change * 100, 2)}%")
@@ -122,15 +136,15 @@ with tab1:
 
     f_s_e_tg_c = f_s_e_tg[f_s_e_tg['Cuenta'] == cuenta]
     col1, col2, col3 = st.columns(3)
-    tot_2024 = f_s_e_tg_c[f_s_e_tg_c['Año'] == 2024]['Apropiación en precios corrientes'].sum()
-    tot_2019 = f_s_e_tg_c[f_s_e_tg_c['Año'] == 2019]['Apropiación en precios corrientes'].sum()
+    tot_2024 = f_s_e_tg_c[f_s_e_tg_c['Año'] == year_vs]['Apropiación en precios constantes (2025)'].sum()
+    tot_2019 = f_s_e_tg_c[f_s_e_tg_c['Año'] == year_base]['Apropiación en precios constantes (2025)'].sum()
 
-    change = ((tot_2024 / tot_2019) ** (1 / (2024 - 2019)))- 1
+    change = ((tot_2024 / tot_2019) ** (1 / (year_vs - year_base)))- 1
     with col1:
-        st.metric(f"Apropiación | {cuenta} | 2019", round(tot_2019 / 1_000_000_000, 2))
+        st.metric(f"Apropiación | {cuenta} | {year_base}", round(tot_2019 / 1_000_000_000, 2))
 
     with col2:
-        st.metric(f"Apropiación | {cuenta} | 2024", round(tot_2024 / 1_000_000_000, 2))
+        st.metric(f"Apropiación | {cuenta} | {year_vs}", round(tot_2024 / 1_000_000_000, 2))
 
     with col3:
         st.metric("Variación anualizada", f"{round(change * 100, 2)}%")
@@ -141,15 +155,15 @@ with tab1:
 
     f_s_e_tg_c_sc = f_s_e_tg_c[f_s_e_tg_c['Subcuenta'] == subcuenta]
     col1, col2, col3 = st.columns(3)
-    tot_2024 = f_s_e_tg_c_sc[f_s_e_tg_c_sc['Año'] == 2024]['Apropiación en precios corrientes'].sum()
-    tot_2019 = f_s_e_tg_c_sc[f_s_e_tg_c_sc['Año'] == 2019]['Apropiación en precios corrientes'].sum()
+    tot_2024 = f_s_e_tg_c_sc[f_s_e_tg_c_sc['Año'] == year_vs]['Apropiación en precios constantes (2025)'].sum()
+    tot_2019 = f_s_e_tg_c_sc[f_s_e_tg_c_sc['Año'] == year_base]['Apropiación en precios constantes (2025)'].sum()
 
-    change = ((tot_2024 / tot_2019) ** (1 / (2024 - 2019)))- 1
+    change = ((tot_2024 / tot_2019) ** (1 / (year_vs - year_base)))- 1
     with col1:
-        st.metric(f"Apropiación | {subcuenta} | 2019", round(tot_2019 / 1_000_000_000, 2))
+        st.metric(f"Apropiación | {subcuenta} | {year_base}", round(tot_2019 / 1_000_000_000, 2))
 
     with col2:
-        st.metric(f"Apropiación | {subcuenta} | 2024", round(tot_2024 / 1_000_000_000, 2))
+        st.metric(f"Apropiación | {subcuenta} | {year_vs}", round(tot_2024 / 1_000_000_000, 2))
 
     with col3:
         st.metric("Variación anualizada", f"{round(change * 100, 2)}%")
@@ -160,15 +174,15 @@ with tab1:
 
     f_s_e_tg_c_sc_o = f_s_e_tg_c_sc[f_s_e_tg_c_sc['Objeto/proyecto'] == objeto]
     col1, col2, col3 = st.columns(3)
-    tot_2024 = f_s_e_tg_c_sc_o[f_s_e_tg_c_sc_o['Año'] == 2024]['Apropiación en precios corrientes'].sum()
-    tot_2019 = f_s_e_tg_c_sc_o[f_s_e_tg_c_sc_o['Año'] == 2019]['Apropiación en precios corrientes'].sum()
+    tot_2024 = f_s_e_tg_c_sc_o[f_s_e_tg_c_sc_o['Año'] == year_vs]['Apropiación en precios constantes (2025)'].sum()
+    tot_2019 = f_s_e_tg_c_sc_o[f_s_e_tg_c_sc_o['Año'] == year_base]['Apropiación en precios constantes (2025)'].sum()
 
-    change = ((tot_2024 / tot_2019) ** (1 / (2024 - 2019)))- 1
+    change = ((tot_2024 / tot_2019) ** (1 / (year_vs - year_base)))- 1
     with col1:
-        st.metric(f"Apropiación | {objeto} | 2019", round(tot_2019 / 1_000_000_000, 2))
+        st.metric(f"Apropiación | {objeto} | {year_base}", round(tot_2019 / 1_000_000_000, 2))
 
     with col2:
-        st.metric(f"Apropiación | {objeto} | 2024", round(tot_2024 / 1_000_000_000, 2))
+        st.metric(f"Apropiación | {objeto} | {year_vs}", round(tot_2024 / 1_000_000_000, 2))
 
     with col3:
         st.metric("Variación anualizada", f"{round(change * 100, 2)}%")
@@ -179,15 +193,15 @@ with tab1:
 
     f_s_e_tg_c_sc_o_sp = f_s_e_tg_c_sc_o[f_s_e_tg_c_sc_o['Subproyecto'] == sub_proyecto]
     col1, col2, col3 = st.columns(3)
-    tot_2024 = f_s_e_tg_c_sc_o_sp[f_s_e_tg_c_sc_o_sp['Año'] == 2024]['Apropiación en precios corrientes'].sum()
-    tot_2019 = f_s_e_tg_c_sc_o_sp[f_s_e_tg_c_sc_o_sp['Año'] == 2019]['Apropiación en precios corrientes'].sum()
+    tot_2024 = f_s_e_tg_c_sc_o_sp[f_s_e_tg_c_sc_o_sp['Año'] == year_vs]['Apropiación en precios constantes (2025)'].sum()
+    tot_2019 = f_s_e_tg_c_sc_o_sp[f_s_e_tg_c_sc_o_sp['Año'] == year_base]['Apropiación en precios constantes (2025)'].sum()
 
-    change = ((tot_2024 / tot_2019) ** (1 / (2024 - 2019)))- 1
+    change = ((tot_2024 / tot_2019) ** (1 / (year_vs - year_base)))- 1
     with col1:
-        st.metric(f"Apropiación | {sub_proyecto} | 2019", round(tot_2019 / 1_000_000_000, 2))
+        st.metric(f"Apropiación | {sub_proyecto} | {year_base}", round(tot_2019 / 1_000_000_000, 2))
 
     with col2:
-        st.metric(f"Apropiación | {sub_proyecto} | 2024", round(tot_2024 / 1_000_000_000, 2))
+        st.metric(f"Apropiación | {sub_proyecto} | {year_vs}", round(tot_2024 / 1_000_000_000, 2))
 
     with col3:
         st.metric("Variación anualizada", f"{round(change * 100, 2)}%")    
@@ -196,7 +210,7 @@ with tab2:
     st.header("Treemap")     
 
     year = st.selectbox("Seleccione el año", 
-                     [2019, 2024])
+                     [2019, 2024, 2025])
     filter_year = df[df['Año'] == year]
     
 
@@ -205,7 +219,7 @@ with tab2:
                             path=[px.Constant('PGN'), 'Sector', 
                                     'Entidad',
                                     'Tipo de gasto', 'Cuenta'],
-                            values='Apropiación en precios corrientes (cifras en miles de millones de pesos)',
+                            values='Apropiación en precios constantes (2025)',
                             title="Matriz de composición anual del PGN <br><sup>Cifras en miles de millones de pesos</sup>",
                             color_continuous_scale='Teal')
             

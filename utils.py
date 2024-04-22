@@ -31,3 +31,5 @@ def create_dataframe_sankey(data, value_column, *columns, **filtros):
 
 
     return rev_info, conc
+
+    
